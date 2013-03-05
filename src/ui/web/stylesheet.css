@@ -1,9 +1,9 @@
 body {
-  font-family: serif
+    font-family: serif
 }
 
 p {
-  line-spacing: 1.2 em
+    line-spacing: 1.2 em
 }
 
 p.img {
@@ -11,9 +11,9 @@ p.img {
 }
 
 h1, h2, h3 {
-  font-family: sans-serif;
+    font-family: sans-serif;
 }
 
 h1.part, h2.subtitle {
-  text-align: center; margin:auto;
+    text-align: center; margin:auto;
 }

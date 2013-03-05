@@ -21,8 +21,8 @@
 ##
 
 import os, HTMLParser, nltk
+#from sx.pisa3 import CreatePDF as to_pdf
 from xhtml2pdf.pisa import CreatePDF as to_pdf
-
 class PDFGenerator():
 
     def __init__(self, downloaded_feeds):

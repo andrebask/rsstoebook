@@ -20,13 +20,14 @@
 #    along with RSStoEbook.  If not, see <http://www.gnu.org/licenses/>.
 ##
 import os, re
-from epub_builder.ez_epub import Section, Book
+#from epub_builder.ez_epub import Section, Book
+from lib.epub_builder.ez_epub import Section, Book
 
 class EPubGenerator():
-    
+
     def __init__(self, downloaded_feeds):
         self.downloaded_feeds = downloaded_feeds
-        
+
     def generate_epub(self, filename):
         print 'generating epub book...'
         sections = []
@@ -41,7 +42,7 @@ class EPubGenerator():
                 subsection.title = article.short_title
                 subsection.text = [
                                    'Author: ' + article.author,
-                                   
+
                                    article.clean_html_content
                                         .replace(article.short_title +'</h1>', '</h1>')
                                         .replace('<html>', '')
@@ -49,12 +50,13 @@ class EPubGenerator():
                                         .replace('<body/>', '')
                                    ]
                 subsections.append(subsection)
-                section.subsections = subsections
+            section.subsections = subsections
             sections.append(section)
-        
+
         book = Book()
         book.title = 'News Feed'
         book.authors = ['RSStoEbook']
         book.sections = sections
-        book.make(os.path.join(os.environ.get('HOME', None) , 'Scaricati') + '/%s' % filename, 'html')
+        book.make(filename, 'html')
         print 'done.'
+

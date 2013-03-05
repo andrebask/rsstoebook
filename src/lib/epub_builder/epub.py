@@ -319,9 +319,13 @@ class EpubBook:
 
 class ImgParser(HTMLParser):
     """HTML Parser used to detect image links in html"""
-    image_urls = []
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.image_urls = []
+
     def handle_starttag(self, tag, attrs):
         if tag == 'img':
             for (att, val) in attrs:
                 if att == 'src':
                     self.image_urls.append(val)
+

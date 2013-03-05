@@ -53,7 +53,8 @@ class Book:
             id += '.'
         if len(section.subsections) > 0:
             for i, subsection in enumerate(section.subsections):
-                self.__addHtmlSection(subsection, id + str(i + 1), depth + 1)
+                 self.__addHtmlSection(subsection, id + str(i + 1), depth + 1)
+
 
     def __addSection(self, section, id, depth):
         if depth > 0:

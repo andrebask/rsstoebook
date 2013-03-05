@@ -26,15 +26,15 @@ from datetime import datetime, timedelta
 from ArticleData import ArticleExtractor
 
 class RSSManager():
-    
+
     threads_num = 4
     feed_list = []
-    
+
     def __init__(self, url_list):
-        
+
         self.feed_url_list = url_list
         self.slot = len(url_list)/self.threads_num
-        
+
     def download_feeds(self):
         print 'downloading feed list...'
         for i in range(1,self.threads_num):
@@ -44,13 +44,13 @@ class RSSManager():
         urls = self.feed_url_list[ self.slot * (self.threads_num-1) : ]
         if len(urls) > 0:
             threading.Thread(target=self.__download, args=(urls,)).start()
-            
+
         for thread in threading.enumerate():
             if thread is not threading.currentThread():
                 thread.join()
-                
+
         return self.feed_list
-            
+
     def __download(self, urls):
         for url in urls:
             feeddata = feedparser.parse(url)
@@ -64,10 +64,10 @@ class RSSManager():
                             feeddata['items'])
             self.feed_list.append(feed)
 
-class FeedManager():  
-    
+class FeedManager():
+
     threads_num = 4
-    
+
     def __init__(self, feed_list):
         self.feed_list = feed_list
         self.downloaded_feed_list = []
@@ -88,40 +88,43 @@ class FeedManager():
             feed_items = item_list[ self.slot * (self.threads_num-1) : ]
             if len(feed_items) > 0:
                 threading.Thread(target=self.__download_articles, args=(feed_items,)).start()
-                
+
             for thread in threading.enumerate():
                 if thread is not threading.currentThread():
                     thread.join()
             j = j+1
-            print 'content of '+ str(j) + ' of ' + str(len(self.feed_list)) + ' feeds downloaded'       
+            print 'content of '+ str(j) + ' of ' + str(len(self.feed_list)) + ' feeds downloaded'
             self.downloaded_feed_list.append(DownloadedFeed(feed.title, feed.description, self.tmp_articles))
-        
+
         return self.downloaded_feed_list
-        
+
     def __download_articles(self, feedItems):
         for item in feedItems:
             now = datetime.now()
             yesterday = now - timedelta(days=1.5)
-            if item['date_parsed'] > yesterday.timetuple():
+            try:
+                if item['date_parsed'] > yesterday.timetuple():
+                    self.tmp_articles.append(ArticleExtractor().get_article_from_item(item))
+            except:
                 self.tmp_articles.append(ArticleExtractor().get_article_from_item(item))
 
 class AbstractFeed():
-    
+
     def __init__(self, title, description):
-        
+
         self.title = title
         self.description = description
-        
+
 class Feed(AbstractFeed):
-    
+
     def __init__(self, title, description, items):
-        
+
         AbstractFeed.__init__(self, title, description)
         self.items = items
 
 class DownloadedFeed(AbstractFeed):
-    
+
     def __init__(self, title, description, articles):
-        
+
         AbstractFeed.__init__(self, title, description)
-        self.articles = articles    
+        self.articles = articles
