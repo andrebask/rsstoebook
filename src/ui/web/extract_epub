@@ -1,0 +1,7 @@
+#!/bin/bash
+cp $1 ./
+file=$(basename "$1")
+mv "$file" "${file%.epub}.zip"
+unzip "${file%.epub}.zip" -d "${file%.epub}"
+ln -s "${file%.epub}/OEBPS/images/" images
+rm "${file%.epub}.zip"
