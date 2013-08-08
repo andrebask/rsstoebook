@@ -21,7 +21,7 @@
 ##
 import os, re
 #from epub_builder.ez_epub import Section, Book
-from lib.epub_builder.ez_epub import Section, Book
+from epub_builder.ez_epub import Section, Book
 
 class EPubGenerator():
 
