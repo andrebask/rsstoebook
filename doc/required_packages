@@ -1,0 +1,7 @@
+python-listparser
+python-feedparser
+python-genshi
+python-cssselect
+python-readability
+python-xhtmltopdf (python-pisa)
+python-nltk
