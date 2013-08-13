@@ -20,9 +20,9 @@
 #    along with RSStoEbook.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
-import os, HTMLParser, nltk
-#from sx.pisa3 import CreatePDF as to_pdf
-from xhtml2pdf.pisa import CreatePDF as to_pdf
+import os, HTMLParser, nltk, unicodedata
+from ho.pisa import CreatePDF as to_pdf
+#from xhtml2pdf.pisa import CreatePDF as to_pdf
 class PDFGenerator():
 
     def __init__(self, downloaded_feeds):
@@ -41,8 +41,5 @@ class PDFGenerator():
                 finaltext += "Author: %s\n\n" % article.author
                 finaltext += article.clean_html_content.replace(article.short_title +'</h1>', '</h1>').replace('<html>', '').replace('</html>', '').replace('<body/>', '').replace('a href=\"', 'a href=\"http://').replace('a href=\"http://http://', 'a href=\"http://')
         finaltext += '</html>'
-        pdf = to_pdf(
-            finaltext,
-            file(filename, "wb"))
-        #if not pdf.err:
-         #   xhtml2pdf.startViewer(filename)
+	finaltext = unicodedata.normalize('NFKD', finaltext).encode('ascii','ignore')
+        pdf = to_pdf(finaltext, file(filename, "wb"))
