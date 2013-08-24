@@ -38,7 +38,7 @@ class PDFGenerator():
             finaltext += "<h1>%s</h1>\n" % feed.title
             for article in feed.articles:
                 finaltext += "<h3>%s</h3>\n\n" % article.short_title
-                finaltext += "Author: %s\n\n" % article.author
+                finaltext += "<p>Author: %s</p>\n\n" % article.author
                 finaltext += article.clean_html_content.replace(article.short_title +'</h1>', '</h1>').replace('<html>', '').replace('</html>', '').replace('<body/>', '').replace('a href=\"', 'a href=\"http://').replace('a href=\"http://http://', 'a href=\"http://')
         finaltext += '</html>'
 	finaltext = unicodedata.normalize('NFKD', finaltext).encode('ascii','ignore')
