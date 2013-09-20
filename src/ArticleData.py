@@ -21,23 +21,25 @@
 ##
 
 from readability.readability import Document
+import logging
 import urllib
 
 class ArticleExtractor():
-    
+
     def get_article_from_item(self, item):
         url = item['link']
+        logging.debug(url)
         author = 'n/a'
         if item.has_key('author'):
             author = item.author
         html = urllib.urlopen(url).read()
         doc = Document(html)
         return Article(doc.title(), doc.short_title(), author, doc.summary())
-    
+
 class Article():
-    
+
     def __init__(self, title, short_title, author, clean_html_content):
-        
+
         self.title = title
         self.short_title = short_title
         self.author = author

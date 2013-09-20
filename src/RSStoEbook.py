@@ -27,9 +27,9 @@ from RSSData import DownloadedFeed
 from EPubData import EPubGenerator
 from PDFData import PDFGenerator
 from ArticleData import ArticleExtractor
-import sys
+import sys, logging
 
-#o = OPMLReader('/home/andrebask/Scaricati/Feeds.opml')            
+#o = OPMLReader('/home/andrebask/Scaricati/Feeds.opml')
 #feeds = RSSManager(o.get_feeds_urls()).download_feeds()
 #down_feeds = FeedManager(feeds).get_downloaded_feeds()
 #EPubGenerator(down_feeds).generate_epub()
@@ -49,15 +49,15 @@ available options:
  -i    download articles importing RSS feeds from a list of opml files
  -f    download articles from a list of RSS feed urls
  -p    download articles from a list of webpage urls
- 
+
 supported output format: epub, pdf
            """ % version
 
 if __name__ == "__main__":
-    
-    try: op = sys.argv[1] 
+
+    try: op = sys.argv[1]
     except: op = ''
-    
+
     if op == '-i':
         opml_files = []
         end = sys.argv.index('-o')
@@ -65,15 +65,18 @@ if __name__ == "__main__":
             opml_files.append(arg)
         feeds_urls = []
         for o in opml_files:
-            feeds_urls + OPMLReader(o).get_feeds_urls()
-        feeds = RSSManager(feeds_urls).download_feeds()
+            feeds_urls.append(OPMLReader(o).get_feeds_urls())
+        feeds = []
+        for fu in feeds_urls:
+            feeds.append((fu, "1970-01-01 00:00:00 UTC"))
+        feeds = RSSManager(feeds).download_feeds()
         down_feeds = FeedManager(feeds).get_downloaded_feeds()
     elif op == '-f':
-        feeds_urls = []
+        feeds = []
         end = sys.argv.index('-o')
         for arg in sys.argv[2:end]:
-            feeds_urls.append(arg)
-        feeds = RSSManager(feeds_urls).download_feeds()
+            feeds.append((arg, "1970-01-01 00:00:00 UTC")
+        feeds = RSSManager(feeds).download_feeds()
         down_feeds = FeedManager(feeds).get_downloaded_feeds()
     elif op == '-p':
         items = []
@@ -87,7 +90,7 @@ if __name__ == "__main__":
         down_feeds = [df]
     else:
         print usage
-        
+
     for a in sys.argv:
         if a == '-o':
             out = sys.argv[sys.argv.index(a)+1]

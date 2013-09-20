@@ -30,20 +30,20 @@ class RSSManager():
     threads_num = 4
     feed_list = []
 
-    def __init__(self, url_list):
-
-        self.feed_url_list = url_list
-        self.slot = len(url_list)/self.threads_num
+    def __init__(self, feed_tuple_list):
+        self.feed_list = []
+        self.feed_tuple_list = feed_tuple_list
+        self.slot = len(feed_tuple_list)/self.threads_num
 
     def download_feeds(self):
         print 'downloading feed list...'
         for i in range(1,self.threads_num):
-            urls = self.feed_url_list[ (i-1) * self.slot : i * self.slot ]
-            if len(urls) > 0:
-                threading.Thread(target=self.__download, args=(urls,)).start()
-        urls = self.feed_url_list[ self.slot * (self.threads_num-1) : ]
-        if len(urls) > 0:
-            threading.Thread(target=self.__download, args=(urls,)).start()
+            feeds = self.feed_tuple_list[ (i-1) * self.slot : i * self.slot ]
+            if len(feeds) > 0:
+                threading.Thread(target=self.__download, args=(feeds,)).start()
+        feeds = self.feed_tuple_list[ self.slot * (self.threads_num-1) : ]
+        if len(feeds) > 0:
+            threading.Thread(target=self.__download, args=(feeds,)).start()
 
         for thread in threading.enumerate():
             if thread is not threading.currentThread():
@@ -51,8 +51,8 @@ class RSSManager():
 
         return self.feed_list
 
-    def __download(self, urls):
-        for url in urls:
+    def __download(self, feeds):
+        for (url, date) in feeds:
             feeddata = feedparser.parse(url)
             try:
                 feed = Feed(feeddata['channel']['title'],
@@ -62,7 +62,7 @@ class RSSManager():
                 feed = Feed(feeddata['url'],
                             '',
                             feeddata['items'])
-            self.feed_list.append(feed)
+            self.feed_list.append((feed, date))
 
 class FeedManager():
 
@@ -78,16 +78,18 @@ class FeedManager():
         print 'downloading feed contents...'
         self.downloaded_feed_list = []
         j=0
-        for feed in self.feed_list:
+        for (feed, since) in self.feed_list:
+            since = datetime.strptime(since, "%Y-%m-%d %H:%M:%S %Z")
+            print since
             self.tmp_articles = []
             item_list = feed.items
             for i in range(1,self.threads_num):
                 feed_items = item_list[ (i-1) * self.slot : i * self.slot ]
                 if len(feed_items) > 0:
-                    threading.Thread(target=self.__download_articles, args=(feed_items,)).start()
+                    threading.Thread(target=self.__download_articles, args=(feed_items, since)).start()
             feed_items = item_list[ self.slot * (self.threads_num-1) : ]
             if len(feed_items) > 0:
-                threading.Thread(target=self.__download_articles, args=(feed_items,)).start()
+                threading.Thread(target=self.__download_articles, args=(feed_items, since)).start()
 
             for thread in threading.enumerate():
                 if thread is not threading.currentThread():
@@ -98,12 +100,10 @@ class FeedManager():
 
         return self.downloaded_feed_list
 
-    def __download_articles(self, feedItems):
+    def __download_articles(self, feedItems, since):
         for item in feedItems:
-            now = datetime.now()
-            yesterday = now - timedelta(days=1.5)
             try:
-                if item['date_parsed'] > yesterday.timetuple():
+                if item['date_parsed'] > since.timetuple():
                     self.tmp_articles.append(ArticleExtractor().get_article_from_item(item))
             except:
                 self.tmp_articles.append(ArticleExtractor().get_article_from_item(item))
