@@ -7,7 +7,7 @@ import shutil
 import subprocess
 import uuid
 import zipfile
-import urllib
+import urllib, httplib2
 from HTMLParser import HTMLParser
 from genshi.template import TemplateLoader
 from lxml import etree
@@ -146,7 +146,7 @@ class EpubBook:
                 print "downloading " + url
                 src = os.path.join(self.rootDir, os.path.split(url)[1])
                 dest = os.path.join("images", os.path.split(url)[1])
-                urllib.urlretrieve(url, src)
+                urllib.urlretrieve(httplib2.iri2uri(url), src)
                 self.addImage(src, dest)
         return urls
 
