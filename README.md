@@ -27,6 +27,6 @@ python-feedparser
 python-genshi  
 python-cssselect  
 python-readability  
-python-xhtmltopdf (python-pisa)  
+python-xhtml2pdf (python-pisa)  
 python-nltk  
 epub-builder (https://github.com/andrebask/epub-builder)
